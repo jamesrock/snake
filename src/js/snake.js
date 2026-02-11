@@ -58,22 +58,11 @@ class Snake {
 
 		this.updateScore();
 
-		const _this = this;
-
-		this.gameOverNode.addEventListener('click', function() {
-			_this.start();
-		});
-
-	};
-	start() {
-
 		this.reset();
 
-		this.segments = makeArray(10, (a, i) => new Segment(i, 0));
-
-		this.createFood();
-
-		this.draw();
+		this.gameOverNode.addEventListener('click', () => {
+			this.reset();
+		});
 
 	};
 	draw() {
@@ -90,9 +79,11 @@ class Snake {
 			this.ctx.fillRect(this.inflate(food.x), this.inflate(food.y), this.size, this.size);
 		});
 
-		setTimeout(() => {
+		clearTimeout(this.timer);
+
+		this.timer = setTimeout(() => {
 			this.update();
-		}, 400 - (5 * this.eaten));
+		}, 300 - this.eaten);
 
 	};
 	update() {
@@ -119,7 +110,7 @@ class Snake {
 
 		if(this.checkCollision(x, y)) {
 			this.gameOverNode.innerHTML = `<div>GAME OVER</div><div>Score: ${formatNumber(this.eaten)}</div><div>Tap to continue</div>`;
-			this.setGameOverScreen('true');
+			this.setGameOverScreen(true);
 			return;
 		};
 
@@ -153,34 +144,27 @@ class Snake {
 			if(food.x === x && food.y === y) {
 				
 				this.eaten ++;
-				
 				this.segments.push(new Segment(food.x, food.y));
-
 				this.foods.splice(i, 1);
 				this.updateScore();
-
+				this.createFood(1);
 				return 'break';
 				
 			};
 
 		});
-
-		if(this.foods.length === 0) {
-			
-			this.createFood();
-
-		};
 		
 		this.move(x, y);
 
 	};
-	createFood() {
+	createFood(count = 17) {
 
-		const {
-			x, y
-		} = this.getRandomXAndY();
-
-		this.foods.push(new Food(x, y));
+		makeArray(count).forEach(() => {
+			const {
+				x, y
+			} = this.getRandomXAndY();
+			this.foods.push(new Food(x, y));
+		});
 		return this;
 
 	};
@@ -222,12 +206,14 @@ class Snake {
 
 	};
 	reset() {
-		
+
 		this.eaten = 0;
 		this.direction = directions.right;
-		this.segments = [];
 		this.foods = [];
-		this.setGameOverScreen('false');
+		this.segments = makeArray(10, (a, i) => new Segment(i, 0));
+		this.createFood();
+		this.draw();
+		this.setGameOverScreen(false);
 		this.updateScore();
 		return this;
 
@@ -245,14 +231,17 @@ class Snake {
 	getRandomXAndY() {
 
 		let 
-		width = this.deflate(this.width)-1,
-		height = this.deflate(this.height)-1,
-		x = random(0, width),
-		y = random(0, height);
+		width = this.deflate(this.width)-2,
+		height = this.deflate(this.height)-2,
+		x = random(1, width),
+		y = random(1, height),
+		query = `${x}${y}`;
 
-		while(this.checkForSegment(`${x}${y}`)) {
-			x = random(0, width);
-			y = random(0, height);
+		while(this.checkForSegment(query)||this.checkForFood(query)) {
+			console.log('clash');
+			x = random(1, width);
+			y = random(1, height);
+			query = `${x}${y}`;
 		};
 
 		return {
@@ -261,15 +250,20 @@ class Snake {
 		};
 
 	};
-	setGameOverScreen(visible) {
+	setGameOverScreen(active) {
 
-		this.gameOverNode.setAttribute('data-active', visible);
+		this.gameOverNode.dataset.active = active;
 		return this;
 
 	};
 	checkForSegment(toCheck) {
 
-		return this.segments.map((segment) => (`${segment.x}${segment.y}`)).some((value) => (toCheck===value));
+		return this.segments.map((segment) => (`${segment.x}${segment.y}`)).includes(toCheck);
+
+	};
+	checkForFood(toCheck) {
+
+		return this.foods.map((food) => (`${food.x}${food.y}`)).includes(toCheck);
 
 	};
 	width = 350;
@@ -352,5 +346,3 @@ document.addEventListener('touchmove', function(e) {
 	snake.turn(direction);
 
 });
-
-snake.start();
