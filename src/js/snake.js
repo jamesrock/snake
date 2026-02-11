@@ -1,5 +1,7 @@
 import { 
 	isValidKey,
+	formatNumber,
+	makeArray,
 	random
 } from '@jamesrock/rockjs';
 
@@ -67,17 +69,11 @@ class Snake {
 
 		this.reset();
 
-		var
-		snake = this,
-		startLength = snake.size;
+		this.segments = makeArray(10, (a, i) => new Segment(i, 0));
 
-		for(var i = 0; i < startLength; i++) {
-			snake.segments.push(new Segment(i, 0));
-		};
+		this.createFood();
 
-		snake.createFood();
-
-		snake.draw();
+		this.draw();
 
 	};
 	draw() {
@@ -96,7 +92,7 @@ class Snake {
 
 		setTimeout(() => {
 			this.update();
-		}, this.speed - (this.multiplier * this.eaten));
+		}, 500 - (10 * this.eaten));
 
 	};
 	update() {
@@ -122,7 +118,7 @@ class Snake {
 		};
 
 		if(this.checkCollision(x, y)) {
-			this.gameOverNode.innerHTML = `GAME OVER<br />You scored ${snake.eaten}.<br />Tap to continue.`;
+			this.gameOverNode.innerHTML = `<div>GAME OVER</div><div>Score: ${formatNumber(snake.eaten)}</div><div>Tap to continue</div>`;
 			this.setGameOverScreen('true');
 			return;
 		};
@@ -282,8 +278,6 @@ class Snake {
 	width = 350;
 	height = 450;
 	size = scale(10);
-	speed = 300;
-	multiplier = 5;
 	eaten = 0;
 	direction = directions.right;
 	segments = [];
