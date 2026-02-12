@@ -1,3 +1,4 @@
+import '../css/app.css';
 import { 
 	isValidKey,
 	formatNumber,
@@ -158,7 +159,7 @@ class Snake {
 		};
 
 	};
-	makeFood(count = 20) {
+	makeFood(count = 32) {
 
 		makeArray(count).forEach(() => {
 			const {
@@ -180,7 +181,7 @@ class Snake {
 		this.checkFood(x, y);
 
 		if(this.checkCollision(x, y)) {
-			this.gameOverNode.innerHTML = `<div>GAME OVER</div><div>Score: ${formatNumber(this.eaten)}</div><div>Tap to continue</div>`;
+			this.gameOverNode.innerHTML = `<h2>GAME OVER</h2><p>Score: ${formatNumber(this.eaten)}</p><p>Tap to continue</p>`;
 			this.setGameOver(true);
 		};
 
@@ -283,22 +284,22 @@ class Snake {
 const 
 body = document.body,
 directions = {
-	'left': 'left',
-	'up': 'up',
-	'right': 'right',
-	'down': 'down'
+	left: 'left',
+	up: 'up',
+	right: 'right',
+	down: 'down'
 },
 directionsKeyMap = {
-	'ArrowLeft': 'left',
-	'ArrowUp': 'up',
-	'ArrowRight': 'right',
-	'ArrowDown': 'down'
+	ArrowLeft: 'left',
+	ArrowUp: 'up',
+	ArrowRight: 'right',
+	ArrowDown: 'down'
 },
 opposites = {
-	'left': 'right',
-	'right': 'left',
-	'up': 'down',
-	'down': 'up'
+	left: 'right',
+	right: 'left',
+	up: 'down',
+	down: 'up'
 },
 adjustment = 0,
 rounder = new Rounder(60),
@@ -315,7 +316,11 @@ snake.renderTo(body);
 document.addEventListener('keydown', (e) => {
 		
 	if(isValidKey(e.key, directionsArray)) {
-		return snake.turn(directionsKeyMap[e.key]);
+		snake.turn(directionsKeyMap[e.key]);
+	};
+
+	if(snake.gameOver && isValidKey(e.key, [' '])) {
+		snake.reset();
 	};
 
 });
