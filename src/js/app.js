@@ -181,7 +181,7 @@ class Snake {
 		this.checkFood(x, y);
 
 		if(this.checkCollision(x, y)) {
-			this.gameOverNode.innerHTML = `<h2>GAME OVER</h2><p>Score: ${formatNumber(this.eaten)}</p><p>Tap to continue</p>`;
+			this.gameOverNode.innerHTML = `<h2>GAME OVER</h2><p class="game-over-score">${formatNumber(this.eaten)}</p><p class="continue">Tap to continue.</p>`;
 			this.setGameOver(true);
 		};
 
@@ -199,7 +199,7 @@ class Snake {
 	};
 	updateScore() {
 
-		this.scoreNode.innerHTML = `score: ${formatNumber(this.eaten)}`;
+		this.scoreNode.innerHTML = `${formatNumber(this.eaten)}`;
 		return this;
 
 	};
@@ -272,7 +272,7 @@ class Snake {
 
 	};
 	width = 350;
-	height = 450;
+	height = 550;
 	size = scaler.inflate(10);
 	eaten = 0;
 	directions = [directions.right];
