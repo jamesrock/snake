@@ -214,8 +214,16 @@ class Snake {
 		this.eaten = 0;
 		this.directions = [directions.right];
 		this.foods = [];
-		this.color = 'black';
 		this.segments = makeArray(10, (a, i) => new Segment(i, 0));
+		this.colors = [
+			'gold',
+			'rgb(237, 0, 73)',
+			'limegreen',
+			'rgb(177, 49, 237)',
+			'rgb(0,100,200)',
+			'rgb(255,125,0)',
+		];
+		this.color = 'black';
 		this.poison = pluckRandom(this.colors);
 		this.setGameOver(false);
 		this.makeFood();
@@ -304,23 +312,9 @@ class Snake {
 		return this.checkForSegment(q)||this.checkForFood(q);
 
 	};
-	colors = [
-		'gold',
-		'rgb(237, 0, 73)',
-		'limegreen',
-		'rgb(177, 49, 237)',
-		'rgb(0,100,200)',
-		'rgb(255,125,0)',
-	];
-	color = 'black';
 	width = 350;
 	height = 550;
 	size = scaler.inflate(10);
-	eaten = 0;
-	directions = [directions.right];
-	segments = [];
-	foods = [];
-	gameOver = false;
 };
 
 const 
