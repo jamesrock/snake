@@ -1,15 +1,15 @@
 import '../css/app.css';
 import { 
+	Rounder,
+	Scaler,
+	GameBase,
 	isValidKey,
 	makeArray,
 	random,
 	getRandom,
 	pluckFirst,
 	pluckRandom,
-	limit,
-	Rounder,
-	Scaler,
-	Storage
+	limit
 } from '@jamesrock/rockjs';
 
 class Food {
@@ -32,18 +32,10 @@ class Segment {
 	};
 };
 
-class Snake {
+class Snake extends GameBase {
 	constructor() {
 
-		this.node = document.createElement('div');
-		this.gameOverNode = document.createElement('div');
-		this.canvas = document.createElement('canvas');
-		this.ctx = this.canvas.getContext('2d');
-		this.storage = new Storage('me.jamesrock.snake');
-
-		this.node.classList.add('snake');
-
-		this.gameOverNode.classList.add('game-over');
+		super('snake');
 
 		this.canvas.width = this.inflate(this.width);
 		this.canvas.height = this.inflate(this.height);
@@ -119,7 +111,7 @@ class Snake {
 
 			this.update();
 
-		}, (250 + adjustment) - this.eaten);
+		}, (250 - this.score));
 
 	};
 	getDirection() {
@@ -159,7 +151,7 @@ class Snake {
 				return true;
 			};
 
-			this.eaten ++;
+			this.score ++;
 			this.makeFood(1);
 
 		};
@@ -214,7 +206,7 @@ class Snake {
 	};
 	reset() {
 
-		this.eaten = 0;
+		this.score = 0;
 		this.directions = [directions.right];
 		this.foods = [];
 		this.segments = makeArray(10, (a, i) => new Segment(i, 0));
@@ -281,26 +273,6 @@ class Snake {
 		};
 
 	};
-	showGameOverScreen() {
-
-		const best = this.storage.get('best') || 0;
-		this.storage.set('best', this.eaten > best ? this.eaten : best);
-
-		this.gameOverNode.innerHTML = `\
-			<div class="game-over-body">\
-				<h2>Game over!</h2>\
-				<div>\
-					<p class="score">${this.eaten}</p>\
-					<p class="best">Best: ${this.storage.get('best')}</p>\
-				</div>\
-				<p class="continue">Tap to continue</p>\
-			</div>`;
-		this.gameOver = true;
-		this.gameOverNode.dataset.active = true;
-
-		return this;
-
-	};
 	checkForSegment(toCheck) {
 
 		return this.segments.map((segment) => (`${segment.x}${segment.y}`)).includes(toCheck);
@@ -342,7 +314,6 @@ opposites = {
 	up: 'down',
 	down: 'up'
 },
-adjustment = 0,
 rounder = new Rounder(60),
 scaler = new Scaler(2),
 directionsArray = Object.keys(directionsKeyMap),
