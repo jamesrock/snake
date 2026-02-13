@@ -15,7 +15,7 @@ import {
 const scaler = new Scaler(2);
 const getMaxSize = () => {
 	
-	const constraint = 1000;
+	const constraint = 800;
 	const h = Math.floor(limit(window.innerHeight, constraint) / 59);
 	const w = Math.floor(limit(window.innerWidth, constraint) / 39);
 
