@@ -44,10 +44,12 @@ class Snake {
 
 		this.gameOverNode.classList.add('game-over');
 
-		this.canvas.width = scaler.inflate(this.width);
-		this.canvas.height = scaler.inflate(this.height);
+		this.canvas.width = this.inflate(this.width);
+		this.canvas.height = this.inflate(this.height);
 
-		this.canvas.style.width = `${this.width}px`;
+		console.log(this.canvas.width);
+
+		this.canvas.style.width = `${scaler.deflate(this.canvas.width)}px`;
 
 		this.node.appendChild(this.canvas);
 		this.node.appendChild(this.gameOverNode);
@@ -61,7 +63,7 @@ class Snake {
 	};
 	draw() {
 
-		this.canvas.width = scaler.inflate(this.width);
+		this.canvas.width = this.inflate(this.width);
 
 		this.segments.forEach((seg) => {
 			this.ctx.fillStyle = this.color;
@@ -134,7 +136,7 @@ class Snake {
 			};
 		};
 
-		if((x === -1) || (y === -1) || (x === this.deflate(this.width)) || (y === this.deflate(this.height))) {
+		if((x === -1) || (y === -1) || (x === this.width) || (y === this.height)) {
 			collision = true;
 		};
 
@@ -170,7 +172,7 @@ class Snake {
 			const numberOfPoison = this.foods.filter((food) => food.color === this.poison).length;
 			const {x, y} = this.getRandomXAndY();
 
-			console.log(numberOfPoison);
+			// console.log(numberOfPoison, x, y);
 			
 			this.foods.push(new Food(x, y, getRandom(numberOfPoison<25 ? [this.poison, ...this.colors] : this.colors)));
 
@@ -217,13 +219,13 @@ class Snake {
 		this.foods = [];
 		this.segments = makeArray(10, (a, i) => new Segment(i, 0));
 		this.colors = [
-			'gold',
-			'rgb(237, 0, 73)',
-			'fuchsia',
+			'gold', // yellow
+			'rgb(237, 0, 73)', // red
+			'magenta',
 			'limegreen',
-			'rgb(177, 49, 237)',
-			'rgb(0,100,200)',
-			'rgb(255,125,0)',
+			'rgb(177, 49, 237)', // purple
+			'rgb(0,100,200)', // blue
+			'rgb(255,125,0)', // orange
 		];
 		this.color = 'black';
 		this.poison = pluckRandom(this.colors);
@@ -249,16 +251,11 @@ class Snake {
 		return (a * this.size);
 
 	};
-	deflate(a) {
-		
-		return (a / scaler.deflate(this.size));
-
-	};
 	getRandomXAndY() {
 
 		let 
-		width = this.deflate(this.width)-2,
-		height = this.deflate(this.height)-2,
+		width = this.width-2,
+		height = this.height-2,
 		x = random(1, width),
 		y = random(1, height);
 
@@ -319,8 +316,8 @@ class Snake {
 		return this.checkForSegment(q)||this.checkForFood(q);
 
 	};
-	width = 350;
-	height = 550;
+	width = 35;
+	height = 55;
 	size = scaler.inflate(10);
 };
 
