@@ -316,7 +316,7 @@ class Snake {
 	width = 35;
 	height = 55;
 	// size = scaler.inflate(10);
-	size = scaler.inflate(Math.floor(limit(window.innerHeight, 800) / 59));
+	size = scaler.inflate(Math.floor(limit(window.innerHeight, 1000) / 59));
 };
 
 const 
