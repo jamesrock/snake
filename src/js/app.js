@@ -1,33 +1,34 @@
 import '../css/app.css';
 import { 
 	isValidKey,
-	formatNumber,
 	makeArray,
 	random,
+	getRandom,
 	pluckFirst,
+	pluckRandom,
 	Rounder,
 	Scaler,
 	Storage
 } from '@jamesrock/rockjs';
 
 class Food {
-	constructor(x, y) {
+	constructor(x, y, color = 'grey') {
 
 		this.x = x;
 		this.y = y;
+		this.color = color;
 
 	};
-	color = 'grey';
 };
 
 class Segment {
-	constructor(x, y) {
+	constructor(x, y, color = 'black') {
 
 		this.x = x;
 		this.y = y;
+		this.color = color;
 
 	};
-	color = 'black'
 };
 
 class Snake {
@@ -62,7 +63,7 @@ class Snake {
 		this.canvas.width = scaler.inflate(this.width);
 
 		this.segments.forEach((seg) => {
-			this.ctx.fillStyle = seg.color;
+			this.ctx.fillStyle = this.color;
 			this.ctx.fillRect(this.inflate(seg.x), this.inflate(seg.y), this.size, this.size);
 		});
 		
@@ -96,7 +97,6 @@ class Snake {
 		};
 
 		this.move(x, y);
-
 		this.draw();
 		
 		clearTimeout(this.timer);
@@ -114,7 +114,7 @@ class Snake {
 
 			this.update();
 
-		}, (300 + adjustment) - this.eaten);
+		}, (250 + adjustment) - this.eaten);
 
 	};
 	getDirection() {
@@ -146,21 +146,33 @@ class Snake {
 
 		if(food) {
 			
-			this.eaten ++;
 			this.segments.push(new Segment(x, y));
 			this.foods.splice(this.foods.indexOf(food), 1);
+			this.color = food.color;
+
+			if(food.color===this.poison) {
+				return true;
+			};
+
+			this.eaten ++;
 			this.makeFood(1);
 
 		};
 
+		return false;
+
 	};
-	makeFood(count = 32) {
+	makeFood(count = 50) {
 
 		makeArray(count).forEach(() => {
-			const {
-				x, y
-			} = this.getRandomXAndY();
-			this.foods.push(new Food(x, y));
+			
+			const numberOfPoison = this.foods.filter((food) => food.color === this.poison).length;
+			const {x, y} = this.getRandomXAndY();
+
+			console.log(numberOfPoison);
+			
+			this.foods.push(new Food(x, y, getRandom(numberOfPoison<25 ? [this.poison, ...this.colors] : this.colors)));
+
 		});
 		return this;
 
@@ -173,11 +185,11 @@ class Snake {
 		seg.y = y;
 		this.segments.push(seg);
 
-		this.checkFood(x, y);
-
-		if(this.checkCollision(x, y)) {
+		if(this.checkCollision(x, y) || this.checkFood(x, y)) {
 			this.setGameOver(true);
 		};
+
+		return this;
 
 	};
 	turn(direction) {
@@ -202,10 +214,21 @@ class Snake {
 		this.eaten = 0;
 		this.directions = [directions.right];
 		this.foods = [];
+		this.color = 'black';
 		this.segments = makeArray(10, (a, i) => new Segment(i, 0));
+		this.poison = pluckRandom(this.colors);
 		this.setGameOver(false);
 		this.makeFood();
-		this.update();
+		this.draw();
+		
+		this.node.style.setProperty('--poison', this.poison);
+		this.node.dataset.preview = 'true';
+
+		setTimeout(() => {
+			this.node.dataset.preview = 'false';
+			this.update();
+		}, 2000);
+
 		return this;
 
 	};
@@ -225,14 +248,22 @@ class Snake {
 		width = this.deflate(this.width)-2,
 		height = this.deflate(this.height)-2,
 		x = random(1, width),
-		y = random(1, height),
-		query = `${x}${y}`;
+		y = random(1, height);
 
-		while(this.checkForSegment(query)||this.checkForFood(query)) {
+		while([
+			`${x}${y}`,
+			`${x}${y+1}`,
+			`${x}${y-1}`,
+			`${x-1}${y}`, 
+			`${x-1}${y+1}`, 
+			`${x-1}${y-1}`, 
+			`${x+1}${y}`, 
+			`${x+1}${y+1}`, 
+			`${x+1}${y-1}`,
+		].map((q) => this.query(q)).includes(true)) {
 			console.log('clash');
 			x = random(1, width);
 			y = random(1, height);
-			query = `${x}${y}`;
 		};
 
 		return {
@@ -268,6 +299,20 @@ class Snake {
 		return this.foods.map((food) => (`${food.x}${food.y}`)).includes(toCheck);
 
 	};
+	query(q) {
+		
+		return this.checkForSegment(q)||this.checkForFood(q);
+
+	};
+	colors = [
+		'gold',
+		'rgb(237, 0, 73)',
+		'limegreen',
+		'rgb(177, 49, 237)',
+		'rgb(0,100,200)',
+		'rgb(255,125,0)',
+	];
+	color = 'black';
 	width = 350;
 	height = 550;
 	size = scaler.inflate(10);

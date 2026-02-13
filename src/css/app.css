@@ -71,19 +71,24 @@ h2 {
 
 canvas {
 	display: block;
-	border: solid 4px #CCC;
 	margin: 0 auto;
 	position: relative;
-	background-color: white;
 }
 
 .snake {
+	border: solid 10px #CCC;
 	position: relative;
+	background-color: white;
+	transition: all .2s;
+
+	&[data-preview="true"] {
+		border-color: var(--poison);
+	}
 }
 
 .game-over {
 	position: absolute;
-	inset: -10px;
+	inset: -20px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -91,7 +96,7 @@ canvas {
 	backdrop-filter: blur(5px);
 	gap: 10px;
 	padding: 20px;
-	background-color: rgba(255, 250, 240, 0.25);
+	background-image: radial-gradient(rgba(255, 250, 240, 1), transparent 50%);
 	transition: opacity 0.2s;
 
 	.score {
@@ -111,7 +116,7 @@ canvas {
 		position: relative;
 		&:before {
 			display: block;
-			content: '';
+			/* content: ''; */
 			border-radius: 100%;
 			background-image: radial-gradient(white, transparent 50%);
 			position: absolute;
