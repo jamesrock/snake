@@ -6,6 +6,7 @@ import {
 	getRandom,
 	pluckFirst,
 	pluckRandom,
+	limit,
 	Rounder,
 	Scaler,
 	Storage
@@ -314,7 +315,8 @@ class Snake {
 	};
 	width = 35;
 	height = 55;
-	size = scaler.inflate(10);
+	// size = scaler.inflate(10);
+	size = scaler.inflate(Math.floor(limit(window.innerHeight, 800) / 59));
 };
 
 const 
