@@ -229,6 +229,8 @@ class Snake {
 		this.gameOver = false;
 		this.makeFood();
 		this.draw();
+
+		this.gameOverNode.dataset.active = false;
 		
 		this.node.style.setProperty('--poison', this.poison);
 		this.node.dataset.preview = 'true';
