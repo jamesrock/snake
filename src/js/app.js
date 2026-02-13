@@ -38,6 +38,7 @@ class Snake {
 		this.gameOverNode = document.createElement('div');
 		this.canvas = document.createElement('canvas');
 		this.ctx = this.canvas.getContext('2d');
+		this.storage = new Storage('me.jamesrock.snake');
 
 		this.node.classList.add('snake');
 
@@ -282,16 +283,17 @@ class Snake {
 	};
 	showGameOverScreen() {
 
-		const best = storage.get('best') || 0;
-		storage.set('best', this.eaten > best ? this.eaten : best);
+		const best = this.storage.get('best') || 0;
+		this.storage.set('best', this.eaten > best ? this.eaten : best);
 
 		this.gameOverNode.innerHTML = `\
 			<h2>GAME OVER!</h2>\
 			<p class="score">${this.eaten}</p>\
 			<p class="continue">Tap to continue.</p>\
-			<p class="best">Best: ${storage.get('best')}</p>`;
+			<p class="best">Best: ${this.storage.get('best')}</p>`;
 		this.gameOver = true;
 		this.gameOverNode.dataset.active = true;
+
 		return this;
 
 	};
@@ -336,7 +338,6 @@ opposites = {
 	down: 'up'
 },
 adjustment = 0,
-storage = new Storage('me.jamesrock.snake'),
 rounder = new Rounder(60),
 scaler = new Scaler(2),
 directionsArray = Object.keys(directionsKeyMap),
