@@ -219,6 +219,7 @@ class Snake {
 		this.colors = [
 			'gold',
 			'rgb(237, 0, 73)',
+			'fuchsia',
 			'limegreen',
 			'rgb(177, 49, 237)',
 			'rgb(0,100,200)',
