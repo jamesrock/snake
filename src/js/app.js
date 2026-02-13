@@ -47,8 +47,6 @@ class Snake {
 		this.canvas.width = this.inflate(this.width);
 		this.canvas.height = this.inflate(this.height);
 
-		console.log(this.canvas.width);
-
 		this.canvas.style.width = `${scaler.deflate(this.canvas.width)}px`;
 
 		this.node.appendChild(this.canvas);
@@ -171,10 +169,8 @@ class Snake {
 			
 			const numberOfPoison = this.foods.filter((food) => food.color === this.poison).length;
 			const {x, y} = this.getRandomXAndY();
-
-			// console.log(numberOfPoison, x, y);
 			
-			this.foods.push(new Food(x, y, getRandom(numberOfPoison<25 ? [this.poison, ...this.colors] : this.colors)));
+			this.foods.push(new Food(x, y, getRandom(numberOfPoison < 25 ? [this.poison, ...this.colors] : this.colors)));
 
 		});
 		return this;
