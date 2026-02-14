@@ -1,29 +1,19 @@
 {
   "name": "snake",
   "version": "1.0.0",
-  "description": "vanilla JS adaptation of the timeless classic Snake",
-  "homepage": "https://github.com/jamesrock/snake#readme",
-  "bugs": {
-    "url": "https://github.com/jamesrock/snake/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jamesrock/snake.git"
-  },
-  "license": "ISC",
-  "author": "James Rock",
   "type": "module",
-  "main": "index.js",
   "scripts": {
     "dev": "vite",
+    "host": "vite --host",
     "build": "vite build",
-    "preview": "vite preview",
-    "host": "vite --host"
+    "preview": "vite preview"
   },
   "devDependencies": {
     "vite": "^7.3.1"
   },
   "dependencies": {
-    "@jamesrock/rockjs": "^1.5.0"
-  }
+    "@jamesrock/rockjs": "^1.9.0"
+  },
+  "author": "James Rock",
+  "license": "ISC"
 }
