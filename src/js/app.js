@@ -13,17 +13,19 @@ import {
 } from '@jamesrock/rockjs';
 
 const scaler = new Scaler(2);
-const getMaxSize = () => {
+const getMaxSize = (baseWidth, baseHeight) => {
 	
 	const constraint = 800;
-	const h = Math.floor(limit(window.innerHeight, constraint) / 59);
-	const w = Math.floor(limit(window.innerWidth, constraint) / 39);
+	const h = Math.floor(limit(window.innerHeight, constraint) / (baseHeight+4));
+	const w = Math.floor(limit(window.innerWidth, constraint) / (baseWidth+4));
+
+	let out = w;
 
 	if(w>h) {
-		return h;
+		out = h;
 	};
 
-	return w;
+	return limit(out, 15);
 
 };
 
@@ -225,13 +227,13 @@ class Snake extends GameBase {
 		this.foods = [];
 		this.segments = makeArray(10, (a, i) => new Segment(i, 0));
 		this.colors = [
-			'gold', // yellow
-			'rgb(237, 0, 73)', // red
-			'magenta',
-			'limegreen',
-			'rgb(177, 49, 237)', // purple
-			'rgb(0,100,200)', // blue
-			'rgb(255,125,0)', // orange
+			'#F8C800', // yellow
+			'#EF0040', // red
+			'#E000C0', // pink
+			'#00E000', // green
+			'#9C00FF', // purple
+			'#0080F0', // blue
+			'#FF7F00', // orange
 		];
 		this.color = 'black';
 		this.poison = pluckRandom(this.colors);
@@ -302,9 +304,9 @@ class Snake extends GameBase {
 		return this.checkForSegment(q)||this.checkForFood(q);
 
 	};
-	width = 35;
-	height = 55;
-	size = scaler.inflate(getMaxSize());
+	width = 30;
+	height = 50;
+	size = scaler.inflate(getMaxSize(30, 50));
 };
 
 const 
