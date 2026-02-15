@@ -380,11 +380,9 @@ document.addEventListener('touchmove', (e) => {
 });
 
 document.addEventListener('click', () => {
+	
 	if(snake.gameOver) {
 		snake.reset();
 	};
-});
 
-// this.gameOverNode.addEventListener('click', () => {
-// 	this.reset();
-// });
+});
