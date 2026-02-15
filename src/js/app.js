@@ -15,7 +15,7 @@ import {
 const scaler = new Scaler(2);
 const getMaxSize = (baseWidth, baseHeight) => {
 	
-	const constraint = 800;
+	const constraint = 1000;
 	const h = Math.floor(limit(window.innerHeight, constraint) / (baseHeight+4));
 	const w = Math.floor(limit(window.innerWidth, constraint) / (baseWidth+4));
 
@@ -25,7 +25,8 @@ const getMaxSize = (baseWidth, baseHeight) => {
 		out = h;
 	};
 
-	return limit(out, 15);
+	// return limit(out, 20);
+	return out;
 
 };
 
@@ -65,10 +66,6 @@ class Snake extends GameBase {
 		this.node.appendChild(this.gameOverNode);
 
 		this.reset();
-
-		this.gameOverNode.addEventListener('click', () => {
-			this.reset();
-		});
 
 	};
 	draw() {
@@ -381,3 +378,13 @@ document.addEventListener('touchmove', (e) => {
 	snake.turn(direction);
 
 });
+
+document.addEventListener('click', () => {
+	if(snake.gameOver) {
+		snake.reset();
+	};
+});
+
+// this.gameOverNode.addEventListener('click', () => {
+// 	this.reset();
+// });
