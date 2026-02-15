@@ -30,6 +30,12 @@ const getMaxSize = (baseWidth, baseHeight) => {
 
 };
 
+const canDouble = (baseWidth, baseHeight) => {
+	
+	return scaler.inflate(baseWidth)<window.innerWidth && scaler.inflate(baseHeight)<window.innerHeight;
+
+};
+
 // console.log(getMaxSize());
 
 class Food {
@@ -65,7 +71,12 @@ class Snake extends GameBase {
 		this.node.appendChild(this.canvas);
 		this.node.appendChild(this.gameOverNode);
 
+		if(canDouble(scaler.deflate(this.canvas.width), scaler.deflate(this.canvas.height))) {
+			this.node.style.transform = 'scale(2)';
+		};
+
 		this.reset();
+		this.draw();
 
 	};
 	draw() {
@@ -80,6 +91,10 @@ class Snake extends GameBase {
 		this.foods.forEach((food) => {
 			this.ctx.fillStyle = food.color;
 			this.ctx.fillRect(this.inflate(food.x), this.inflate(food.y), this.size, this.size);
+		});
+
+		this.animationFrame = requestAnimationFrame(() => {
+			this.draw();
 		});
 
 	};
@@ -107,11 +122,11 @@ class Snake extends GameBase {
 		};
 
 		this.move(x, y);
-		this.draw();
+		// this.draw();
 		
 		clearTimeout(this.timer);
 
-		if(this.gameOver) {
+		if(this.gameOver || this.dying) {
 			return;
 		};
 
@@ -194,7 +209,11 @@ class Snake extends GameBase {
 		this.segments.push(seg);
 
 		if(this.checkCollision(x, y) || this.checkFood(x, y)) {
-			this.showGameOverScreen(true);
+			
+			this.animate(() => {
+				this.showGameOverScreen(true);
+			});
+			
 		};
 
 		return this;
@@ -235,8 +254,9 @@ class Snake extends GameBase {
 		this.color = 'black';
 		this.poison = pluckRandom(this.colors);
 		this.gameOver = false;
+		this.dying = false;
 		this.makeFood();
-		this.draw();
+		// this.draw();
 
 		this.gameOverNode.dataset.active = false;
 		
@@ -301,9 +321,42 @@ class Snake extends GameBase {
 		return this.checkForSegment(q)||this.checkForFood(q);
 
 	};
+	animate(callback) {
+
+		let invisible = true;
+		const color = this.color;
+
+		this.dying = true;
+
+		makeArray(5, (a, i) => {
+			
+			setTimeout(() => {
+
+				this.color = invisible ? 'white' : color;
+
+				// this.draw();
+
+				invisible = !invisible;
+
+				if(i===4) {
+					callback();
+				};
+
+			}, 400*(i+1));
+
+		});
+
+	};
+	stop() {
+		
+		cancelAnimationFrame(this.animationFrame);
+		return this;
+
+	};
 	width = 30;
 	height = 50;
-	size = scaler.inflate(getMaxSize(30, 50));
+	// size = scaler.inflate(getMaxSize(30, 50));
+	size = scaler.inflate(10);
 };
 
 const 
