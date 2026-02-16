@@ -79,7 +79,7 @@ class Snake extends GameBase {
 		});
 
 		this.animationFrame = requestAnimationFrame(() => {
-			this.draw();
+			this.render();
 		});
 
 		return this;
