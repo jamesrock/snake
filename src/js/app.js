@@ -283,7 +283,7 @@ class Snake extends GameBase {
 			`${x+1}${y+1}`, 
 			`${x+1}${y-1}`,
 		].map((q) => this.query(q)).includes(true)) {
-			console.log('clash');
+			// console.log('clash');
 			x = random(1, width);
 			y = random(1, height);
 		};
@@ -386,6 +386,14 @@ document.addEventListener('keydown', (e) => {
 
 });
 
+document.addEventListener('click', () => {
+	
+	if(snake.gameOver) {
+		snake.reset();
+	};
+
+});
+
 document.addEventListener('touchstart', (e) => {
 
 	touchX = e.touches[0].clientX;
@@ -414,13 +422,5 @@ document.addEventListener('touchmove', (e) => {
 	};
 
 	snake.turn(direction);
-
-});
-
-document.addEventListener('click', () => {
-	
-	if(snake.gameOver) {
-		snake.reset();
-	};
 
 });
