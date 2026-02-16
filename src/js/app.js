@@ -59,6 +59,7 @@ class Snake extends GameBase {
 		this.node.appendChild(this.canvas);
 		this.node.appendChild(this.gameOverNode);
 
+		this.showGameOverScreen();
 		this.reset();
 		this.draw();
 
