@@ -234,10 +234,10 @@ class Snake extends GameBase {
 		this.colors = [
 			'#F8C800', // yellow
 			'#EF0040', // red
-			'#E000C0', // pink
+			'#FF00FF', // pink
 			'#00E000', // green
 			'#9C00FF', // purple
-			'#0080F0', // blue
+			'#25CCFD', // blue
 			'#FF7F00', // orange
 		];
 		this.color = 'black';
