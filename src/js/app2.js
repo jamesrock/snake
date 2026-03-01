@@ -12,6 +12,7 @@ import {
 	pluckRandom,
 } from '@jamesrock/rockjs';
 import { Maker } from './Maker';
+import { mazes } from './mazes';
 
 setDocumentHeight();
 
@@ -23,17 +24,29 @@ const canScale = (baseWidth, baseHeight) => {
 
 };
 
-class Food {
-	constructor(x, y, color = 'grey') {
+const mapToGrid = (pixels, w) => {
+  console.log(`mapToGrid`, w);
+  // return [];
+  let x = 0;
+  let y = 0;
+  return pixels.map((a, index) => {
 
-		this.x = x;
-		this.y = y;
-		this.color = color;
+    const bob = [!!a, x, y, index];
 
-	};
+    if(x > 0 && x%(w-1)===0) {
+      x = 0;
+      y ++;
+    }
+    else {
+      x ++;
+    };
+
+    return bob;
+
+  });
 };
 
-class Segment {
+class Wall {
 	constructor(x, y, color = 'black') {
 
 		this.x = x;
@@ -43,15 +56,57 @@ class Segment {
 	};
 };
 
-class Snake extends GameBase {
-	constructor() {
+class Coin {
+	constructor(x, y, color = 'gold') {
 
-		super('snake');
+		this.x = x;
+		this.y = y;
+		this.color = color;
+
+	};
+};
+
+class Maze extends GameBase {
+	constructor(data, mode = 'easy') {
+
+		super('maze');
 
 		if(canScale(scaler.deflate(this.inflate(this.width)), scaler.deflate(this.inflate(this.height)))) {
 			this.node.dataset.scale = 'true';
 			this.size = scaler.inflate(this.size);
 		};
+
+		const targetWidth = 500;
+
+		this.settings = {
+      'easy': {
+        pixelSize: 15,
+        width: 37,
+        height: 49
+      },
+      'medium': {
+        pixelSize: 12,
+        width: 46,
+        height: 61
+      },
+      'hard': {
+        pixelSize: 10,
+        width: 55,
+        height: 73
+      },
+    };
+
+		this.mode = mode;
+		this.props = this.settings[this.mode];
+
+		this.width = this.props.width;
+		this.height = this.props.height;
+		this.size = scaler.inflate(targetWidth / this.props.width);
+
+		const grid = mapToGrid(data, this.props.width);
+
+		this.data = data;
+		this.walls = grid.filter((a) => a[0]).map(([isWall, x, y]) => new Wall(x, y));
 
 		this.canvas.width = this.inflate(this.width);
 		this.canvas.height = this.inflate(this.height);
@@ -65,29 +120,34 @@ class Snake extends GameBase {
 		this.reset();
 		this.render();
 
+		console.log(grid);
+		console.log(this);
+
 	};
 	render() {
 
 		this.canvas.width = this.inflate(this.width);
 
-		this.segments.forEach((seg) => {
+		this.walls.forEach((seg) => {
 			this.ctx.fillStyle = this.color;
 			this.ctx.fillRect(this.inflate(seg.x), this.inflate(seg.y), this.size, this.size);
 		});
 
-		this.foods.forEach((food) => {
-			this.ctx.fillStyle = food.color;
-			this.ctx.fillRect(this.inflate(food.x), this.inflate(food.y), this.size, this.size);
+		this.coins.forEach((coin) => {
+			this.ctx.fillStyle = coin.color;
+			this.ctx.fillRect(this.inflate(coin.x), this.inflate(coin.y), this.size, this.size);
 		});
 
 		this.animationFrame = requestAnimationFrame(() => {
-			this.render();
+			// this.render();
 		});
 
 		return this;
 
 	};
 	update() {
+
+	  return;
 
 		var
 		seg = this.segments[this.segments.length-1],
@@ -139,8 +199,8 @@ class Snake extends GameBase {
 
 		let collision = false;
 
-		for(var i = 1; i < this.segments.length-2; i++) {
-			const {x: sX, y: sY} = this.segments[i];
+		for(var i = 1; i < this.walls.length-2; i++) {
+			const {x: sX, y: sY} = this.walls[i];
 			if(sX === x && sY === y) {
 				collision = true;
 			};
@@ -155,12 +215,11 @@ class Snake extends GameBase {
 	};
 	checkFood(x, y) {
 
-		const food = this.foods.find((food) => food.x === x && food.y === y);
+		const food = this.coins.find((food) => food.x === x && food.y === y);
 
 		if(food) {
 
-			this.segments.push(new Segment(x, y));
-			this.foods.splice(this.foods.indexOf(food), 1);
+			this.coins.splice(this.coins.indexOf(food), 1);
 			this.color = food.color;
 
 			if(food.color===this.poison) {
@@ -168,24 +227,11 @@ class Snake extends GameBase {
 			};
 
 			this.score ++;
-			this.makeFood(1);
+			this.makeCoins(1);
 
 		};
 
 		return false;
-
-	};
-	makeFood(count = 50) {
-
-		makeArray(count).forEach(() => {
-
-			const numberOfPoison = this.foods.filter((food) => food.color === this.poison).length;
-			const {x, y} = this.getRandomXAndY();
-
-			this.foods.push(new Food(x, y, getRandom(numberOfPoison < 25 ? [this.poison, ...this.colors] : this.colors)));
-
-		});
-		return this;
 
 	};
 	move(x, y) {
@@ -228,8 +274,8 @@ class Snake extends GameBase {
 
 		this.score = 0;
 		this.directions = [directions.right];
-		this.foods = [];
-		this.segments = makeArray(10, (a, i) => new Segment(i, 0));
+		// this.walls = [];
+		this.coins = [];
 		this.colors = [
 			'#F8C800', // yellow
 			'#EF0040', // red
@@ -240,15 +286,11 @@ class Snake extends GameBase {
 			'#FF7F00', // orange
 		];
 		this.color = 'black';
-		this.poison = pluckRandom(this.colors);
 		this.gameOver = false;
 		this.dying = false;
-		this.makeFood();
+		// this.makeCoins();
 
 		this.gameOverNode.dataset.active = false;
-
-		this.node.style.setProperty('--poison', this.poison);
-		this.node.dataset.preview = true;
 
 		setTimeout(() => {
 			this.node.dataset.preview = false;
@@ -261,6 +303,34 @@ class Snake extends GameBase {
 	inflate(a) {
 
 		return (a * this.size);
+
+	};
+	checkForWall(toCheck) {
+
+		return this.walls.map((wall) => (`${wall.x}${wall.y}`)).includes(toCheck);
+
+	};
+	checkForFood(toCheck) {
+
+		return this.coins.map((coin) => (`${coin.x}${coin.y}`)).includes(toCheck);
+
+	};
+	query(q) {
+
+		return this.checkForWall(q)||this.checkForFood(q);
+
+	};
+	makeCoins(count = 50) {
+
+		makeArray(count).forEach(() => {
+
+			const numberOfPoison = this.coins.filter((food) => food.color === this.poison).length;
+			const {x, y} = this.getRandomXAndY();
+
+			this.coins.push(new Coin(x, y, getRandom(numberOfPoison < 25 ? [this.poison, ...this.colors] : this.colors)));
+
+		});
+		return this;
 
 	};
 	getRandomXAndY() {
@@ -293,54 +363,12 @@ class Snake extends GameBase {
 		};
 
 	};
-	checkForSegment(toCheck) {
-
-		return this.segments.map((segment) => (`${segment.x}${segment.y}`)).includes(toCheck);
-
-	};
-	checkForFood(toCheck) {
-
-		return this.foods.map((food) => (`${food.x}${food.y}`)).includes(toCheck);
-
-	};
-	query(q) {
-
-		return this.checkForSegment(q)||this.checkForFood(q);
-
-	};
-	animate(callback) {
-
-		let invisible = true;
-		const color = this.color;
-
-		this.dying = true;
-
-		makeArray(5, (a, i) => {
-
-			setTimeout(() => {
-
-				this.color = invisible ? 'white' : color;
-
-				invisible = !invisible;
-
-				if(i===4) {
-					callback();
-				};
-
-			}, 400*(i+1));
-
-		});
-
-	};
 	stop() {
 
 		cancelAnimationFrame(this.animationFrame);
 		return this;
 
 	};
-	width = 30;
-	height = 50;
-	size = scaler.inflate(10);
 };
 
 const
@@ -365,12 +393,13 @@ opposites = {
 },
 directionsArray = Object.keys(directionsKeyMap),
 rounder = new Rounder(60),
-snake = window.snake = new Snake();
+mode = 'easy',
+snake = window.snake = new Maze(mazes[mode][0], mode);
 
 let touchX = 0;
 let touchY = 0;
 
-// snake.renderTo(body);
+snake.renderTo(body);
 
 document.addEventListener('keydown', (e) => {
 
@@ -423,4 +452,4 @@ document.addEventListener('touchmove', (e) => {
 
 });
 
-new Maker();
+// new Maker();
