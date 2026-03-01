@@ -293,14 +293,14 @@ class Snake extends GameBase {
 		};
 
 	};
-	checkForSegment(toCheck) {
+	checkForSegment(q) {
 
-		return this.segments.map((segment) => (`x${segment.x}y${segment.y}`)).includes(toCheck);
+		return this.segments.map((segment) => (`x${segment.x}y${segment.y}`)).includes(q);
 
 	};
-	checkForFood(toCheck) {
+	checkForFood(q) {
 
-		return this.foods.map((food) => (`x${food.x}y${food.y}`)).includes(toCheck);
+		return this.foods.map((food) => (`x${food.x}y${food.y}`)).includes(q);
 
 	};
 	query(q) {

@@ -8,8 +8,7 @@ import {
 	makeArray,
 	random,
 	getRandom,
-	pluckFirst,
-	pluckRandom,
+	getLast,
 } from '@jamesrock/rockjs';
 import { Maker } from './Maker';
 import { mazes } from './mazes';
@@ -25,8 +24,6 @@ const canScale = (baseWidth, baseHeight) => {
 };
 
 const mapToGrid = (pixels, w) => {
-  console.log(`mapToGrid`, w);
-  // return [];
   let x = 0;
   let y = 0;
   return pixels.map((a, index) => {
@@ -128,7 +125,7 @@ class Maze extends GameBase {
 		this.canvas.width = this.inflate(this.width);
 
 		this.walls.forEach((seg) => {
-			this.ctx.fillStyle = this.color;
+			this.ctx.fillStyle = seg.color;
 			this.ctx.fillRect(this.inflate(seg.x), this.inflate(seg.y), this.size, this.size);
 		});
 
@@ -138,7 +135,7 @@ class Maze extends GameBase {
 		});
 
 		this.toSquare().forEach(([x, y]) => {
-			this.ctx.fillStyle = 'red';
+			this.ctx.fillStyle = 'magenta';
 			this.ctx.fillRect(this.inflate(x), this.inflate(y), this.size, this.size);
 		});
 
@@ -151,7 +148,7 @@ class Maze extends GameBase {
 	};
 	update() {
 
-		if(this.gameOver || this.dying) {
+		if(this.gameOver) {
 			return;
 		};
 
@@ -167,11 +164,6 @@ class Maze extends GameBase {
 			[x, y-1],
 			[x, y]
 		];
-
-	};
-	getDirection() {
-
-		return pluckFirst(this.directions);
 
 	};
 	checkCollision(x, y) {
@@ -276,8 +268,8 @@ class Maze extends GameBase {
 	reset() {
 
 		this.score = 0;
-		this.directions = [directions.right];
-		// this.walls = [];
+		this.x = 2;
+		this.y = 1;
 		this.coins = [];
 		this.colors = [
 			'#F8C800', // yellow
@@ -288,17 +280,10 @@ class Maze extends GameBase {
 			'#25CCFD', // blue
 			'#FF7F00', // orange
 		];
-		this.color = 'black';
 		this.gameOver = false;
-		this.dying = false;
 		// this.makeCoins();
 
 		this.gameOverNode.dataset.active = false;
-
-		setTimeout(() => {
-			this.node.dataset.preview = false;
-			this.update();
-		}, 2000);
 
 		return this;
 
@@ -308,14 +293,14 @@ class Maze extends GameBase {
 		return (a * this.size);
 
 	};
-	checkForWall(toCheck) {
+	checkForWall(q) {
 
-		return this.walls.map((wall) => (`x${wall.x}y${wall.y}`)).includes(toCheck);
+		return this.walls.map((wall) => (`x${wall.x}y${wall.y}`)).includes(q);
 
 	};
-	checkForFood(toCheck) {
+	checkForFood(q) {
 
-		return this.coins.map((coin) => (`x${coin.x}y${coin.y}`)).includes(toCheck);
+		return this.coins.map((coin) => (`x${coin.x}y${coin.y}`)).includes(q);
 
 	};
 	query(q) {
@@ -378,31 +363,20 @@ class Maze extends GameBase {
 
 const
 body = document.body,
-directions = {
-	left: 'left',
-	up: 'up',
-	right: 'right',
-	down: 'down'
-},
 directionsKeyMap = {
 	ArrowLeft: 'left',
 	ArrowUp: 'up',
 	ArrowRight: 'right',
 	ArrowDown: 'down'
 },
-opposites = {
-	left: 'right',
-	right: 'left',
-	up: 'down',
-	down: 'up'
-},
 directionsArray = Object.keys(directionsKeyMap),
-rounder = new Rounder(60),
-mode = 'medium',
-snake = window.snake = new Maze(mazes[mode][0], mode);
+rounder = new Rounder(20),
+mode = 'hard',
+snake = window.snake = new Maze(getLast(mazes[mode]), mode);
 
-let touchX = 0;
-let touchY = 0;
+let touch = null;
+let xMovement = 0;
+let yMovement = 0;
 
 snake.renderTo(body);
 
@@ -428,33 +402,58 @@ document.addEventListener('click', () => {
 
 document.addEventListener('touchstart', (e) => {
 
-	touchX = e.touches[0].clientX;
-	touchY = e.touches[0].clientY;
+  touch = e.touches[0];
+  xMovement = 0;
+	yMovement = 0;
+
+	e.preventDefault();
 
 });
 
 document.addEventListener('touchmove', (e) => {
 
-	const { clientX, clientY } = e.touches[0];
-	const touchXDiff = rounder.round(clientX - touchX);
-	const touchYDiff = rounder.round(clientY - touchY);
-	let direction;
+	const {clientX: originalClientX, clientY: originalClientY} = touch;
+	const {clientX, clientY} = e.touches[0];
+	const x = rounder.round(clientX - originalClientX);
+	const y = rounder.round(clientY - originalClientY);
 
-	if((touchXDiff > 0)) {
-		direction = directions.right;
-	}
-	else if((touchXDiff < 0)) {
-		direction = directions.left;
-	}
-	else if((touchYDiff > 0)) {
-		direction = directions.down;
-	}
-	else if((touchYDiff < 0)) {
-		direction = directions.up;
+	if(x !== xMovement) {
+		document.dispatchEvent(new Event(x > xMovement ? 'drag-right' : 'drag-left'));
 	};
 
-	snake.move(direction);
+	if(y !== yMovement) {
+		document.dispatchEvent(new Event(y > yMovement ? 'drag-down' : 'drag-up'));
+	};
+
+	xMovement = x;
+	yMovement = y;
 
 });
 
-// new Maker();
+document.addEventListener('drag-up', () => {
+
+	snake.move('up');
+	console.log('up');
+
+});
+
+document.addEventListener('drag-down', () => {
+
+	snake.move('down');
+	console.log('up');
+
+});
+
+document.addEventListener('drag-right', () => {
+
+	snake.move('right');
+
+});
+
+document.addEventListener('drag-left', () => {
+
+	snake.move('left');
+
+});
+
+// window.maker = new Maker();

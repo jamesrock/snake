@@ -107,13 +107,13 @@ export class Maker {
     changeHandler();
 
     let knobs = null;
-    let data = makeArray(props.width*props.height, () => 0);
+    let data = this.data = makeArray(props.width*props.height, () => 0);
     const activeMap = {
       'yes': 1,
       'no': 0
     };
 
-    target.addEventListener('touchstart', () => {
+    target.addEventListener('touchstart', (e) => {
       knobs = [];
     });
 
@@ -122,18 +122,9 @@ export class Maker {
      	if(knob?.classList.contains('grid-pixel')) {
     		if(knobs.indexOf(knob)===-1) {
      			knobs.push(knob);
-     			knob.dataset.active = 'yes';
-     			data[knob.dataset.index] = activeMap[knob.dataset.active];
+          knob.dataset.active = knob.dataset.active === 'yes' ? 'no' : 'yes';
+          data[knob.dataset.index] = activeMap[knob.dataset.active];
     		};
-     	};
-     	e.preventDefault();
-    });
-
-    target.addEventListener('click', (e) => {
-     	const knob = e.target;
-     	if(knob?.classList.contains('grid-pixel')) {
-    		knob.dataset.active = knob.dataset.active === 'yes' ? 'no' : 'yes';
-    		data[knob.dataset.index] = activeMap[knob.dataset.active];
      	};
      	e.preventDefault();
     });
@@ -147,6 +138,11 @@ export class Maker {
         copyButton.innerText = 'copy';
       }, 2000);
     });
+
+  };
+  getData() {
+
+    return JSON.stringify(this.data);
 
   };
 };
