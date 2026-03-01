@@ -120,7 +120,6 @@ class Maze extends GameBase {
 		this.reset();
 		this.render();
 
-		console.log(grid);
 		console.log(this);
 
 	};
@@ -138,8 +137,13 @@ class Maze extends GameBase {
 			this.ctx.fillRect(this.inflate(coin.x), this.inflate(coin.y), this.size, this.size);
 		});
 
+		this.toSquare().forEach(([x, y]) => {
+			this.ctx.fillStyle = 'red';
+			this.ctx.fillRect(this.inflate(x), this.inflate(y), this.size, this.size);
+		});
+
 		this.animationFrame = requestAnimationFrame(() => {
-			// this.render();
+			this.render();
 		});
 
 		return this;
@@ -147,47 +151,22 @@ class Maze extends GameBase {
 	};
 	update() {
 
-	  return;
-
-		var
-		seg = this.segments[this.segments.length-1],
-		x = seg.x,
-		y = seg.y,
-		direction = this.direction = this.getDirection();
-
-		switch(direction) {
-			case directions.right:
-				x ++;
-			break;
-			case directions.left:
-				x --;
-			break;
-			case directions.down:
-				y ++;
-			break;
-			case directions.up:
-				y --;
-			break;
-		};
-
-		this.move(x, y);
-
-		clearTimeout(this.timer);
-
 		if(this.gameOver || this.dying) {
 			return;
 		};
 
-		this.timer = setTimeout(() => {
+	};
+	toSquare() {
 
-			if(this.directions.length===0) {
-				// nothing queued, continue heading in the same direction
-				this.directions.push(direction);
-			};
+	  const x = this.x;
+		const y = this.y;
 
-			this.update();
-
-		}, (250 - this.score));
+	  return [
+			[x-1, y-1],
+			[x-1, y],
+			[x, y-1],
+			[x, y]
+		];
 
 	};
 	getDirection() {
@@ -213,7 +192,7 @@ class Maze extends GameBase {
 		return collision;
 
 	};
-	checkFood(x, y) {
+	checkCoins(x, y) {
 
 		const food = this.coins.find((food) => food.x === x && food.y === y);
 
@@ -234,34 +213,58 @@ class Maze extends GameBase {
 		return false;
 
 	};
-	move(x, y) {
+	move(direction) {
 
-		const seg = this.segments.shift();
-
-		seg.x = x;
-		seg.y = y;
-		this.segments.push(seg);
-
-		if(this.checkCollision(x, y) || this.checkFood(x, y)) {
-
-			this.animate(() => {
-				this.showGameOverScreen(true);
-			});
-
+	  if(!this.canMove(direction)) {
+			return;
 		};
+
+		switch(direction) {
+      case 'up':
+        this.y --;
+      break;
+      case 'down':
+        this.y ++;
+      break;
+      case 'left':
+        this.x --;
+      break;
+      case 'right':
+        this.x ++;
+      break;
+		};
+
+		// this.checkCoins(x, y);
 
 		return this;
 
 	};
-	turn(direction) {
+	canMove(direction) {
 
-		if(!direction || direction === this.directions[this.directions.length-1] || direction === opposites[this.direction]) {
-			return;
+    let x = this.x;
+    let y = this.y;
+
+    switch(direction) {
+      case 'up':
+        y --;
+      break;
+      case 'down':
+        y ++;
+      break;
+      case 'left':
+        x --;
+      break;
+      case 'right':
+        x ++;
+      break;
 		};
 
-		this.directions.push(direction);
-
-		return this;
+    return ![
+			`x${x-1}y${y-1}`,
+			`x${x-1}y${y}`,
+			`x${x}y${y-1}`,
+			`x${x}y${y}`,
+		].map((q) => this.checkForWall(q)).includes(true);
 
 	};
 	renderTo(to) {
@@ -307,12 +310,12 @@ class Maze extends GameBase {
 	};
 	checkForWall(toCheck) {
 
-		return this.walls.map((wall) => (`${wall.x}${wall.y}`)).includes(toCheck);
+		return this.walls.map((wall) => (`x${wall.x}y${wall.y}`)).includes(toCheck);
 
 	};
 	checkForFood(toCheck) {
 
-		return this.coins.map((coin) => (`${coin.x}${coin.y}`)).includes(toCheck);
+		return this.coins.map((coin) => (`x${coin.x}y${coin.y}`)).includes(toCheck);
 
 	};
 	query(q) {
@@ -369,6 +372,8 @@ class Maze extends GameBase {
 		return this;
 
 	};
+	x = 2;
+	y = 1;
 };
 
 const
@@ -393,7 +398,7 @@ opposites = {
 },
 directionsArray = Object.keys(directionsKeyMap),
 rounder = new Rounder(60),
-mode = 'easy',
+mode = 'medium',
 snake = window.snake = new Maze(mazes[mode][0], mode);
 
 let touchX = 0;
@@ -404,7 +409,7 @@ snake.renderTo(body);
 document.addEventListener('keydown', (e) => {
 
 	if(isValidKey(e.code, directionsArray)) {
-		snake.turn(directionsKeyMap[e.key]);
+		snake.move(directionsKeyMap[e.key]);
 	};
 
 	if(snake.gameOver && isValidKey(e.code, ['Space'])) {
@@ -448,7 +453,7 @@ document.addEventListener('touchmove', (e) => {
 		direction = directions.up;
 	};
 
-	snake.turn(direction);
+	snake.move(direction);
 
 });
 

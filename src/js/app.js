@@ -272,15 +272,15 @@ class Snake extends GameBase {
 		y = random(1, height);
 
 		while([
-			`${x}${y}`,
-			`${x}${y+1}`,
-			`${x}${y-1}`,
-			`${x-1}${y}`,
-			`${x-1}${y+1}`,
-			`${x-1}${y-1}`,
-			`${x+1}${y}`,
-			`${x+1}${y+1}`,
-			`${x+1}${y-1}`,
+			`x${x}y${y}`,
+			`x${x}y${y+1}`,
+			`x${x}y${y-1}`,
+			`x${x-1}y${y}`,
+			`x${x-1}y${y+1}`,
+			`x${x-1}y${y-1}`,
+			`x${x+1}y${y}`,
+			`x${x+1}y${y+1}`,
+			`x${x+1}y${y-1}`,
 		].map((q) => this.query(q)).includes(true)) {
 			// console.log('clash');
 			x = random(1, width);
@@ -295,12 +295,12 @@ class Snake extends GameBase {
 	};
 	checkForSegment(toCheck) {
 
-		return this.segments.map((segment) => (`${segment.x}${segment.y}`)).includes(toCheck);
+		return this.segments.map((segment) => (`x${segment.x}y${segment.y}`)).includes(toCheck);
 
 	};
 	checkForFood(toCheck) {
 
-		return this.foods.map((food) => (`${food.x}${food.y}`)).includes(toCheck);
+		return this.foods.map((food) => (`x${food.x}y${food.y}`)).includes(toCheck);
 
 	};
 	query(q) {
