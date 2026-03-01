@@ -37,7 +37,7 @@ export class Maker {
       },
     };
 
-    const mode = 'hard';
+    const mode = 'easy';
     const props = settings[mode];
     const maker = makeNode('div', 'maker');
     const inputs = makeNode('div', 'inputs');

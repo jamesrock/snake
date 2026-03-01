@@ -98,18 +98,22 @@ class Maze extends GameBase {
 
 		this.width = this.props.width;
 		this.height = this.props.height;
-		this.size = scaler.inflate(targetWidth / this.props.width);
+		// this.size = scaler.inflate(targetWidth / this.props.width);
+		this.size = scaler.inflate(40);
 
 		const grid = mapToGrid(data, this.props.width);
 
 		this.data = data;
 		this.walls = grid.filter((a) => a[0]).map(([isWall, x, y]) => new Wall(x, y));
 
-		this.canvas.width = this.inflate(this.width);
-		this.canvas.height = this.inflate(this.height);
+		// this.canvas.width = this.inflate(this.width);
+		this.canvas.width = scaler.inflate(window.innerWidth);
+		// this.canvas.height = this.inflate(this.height);
+		this.canvas.height = scaler.inflate(window.innerHeight);
 		this.canvas.style.width = `${scaler.deflate(this.canvas.width)}px`;
 
-		this.node.style.borderWidth = `${scaler.deflate(this.size)}px`;
+		console.log(window.innerWidth, window.innerHeight);
+
 		this.node.appendChild(this.canvas);
 		this.node.appendChild(this.gameOverNode);
 
@@ -122,11 +126,12 @@ class Maze extends GameBase {
 	};
 	render() {
 
-		this.canvas.width = this.inflate(this.width);
+		// this.canvas.width = this.inflate(this.width);
+		this.canvas.width = scaler.inflate(window.innerWidth);
 
 		this.walls.forEach((seg) => {
 			this.ctx.fillStyle = seg.color;
-			this.ctx.fillRect(this.inflate(seg.x), this.inflate(seg.y), this.size, this.size);
+			this.ctx.fillRect(this.inflate(seg.x + this.x), this.inflate(seg.y + this.y), this.size, this.size);
 		});
 
 		this.coins.forEach((coin) => {
@@ -155,8 +160,8 @@ class Maze extends GameBase {
 	};
 	toSquare() {
 
-	  const x = this.x;
-		const y = this.y;
+		const x = this.manX;
+		const y = this.manY;
 
 	  return [
 			[x-1, y-1],
@@ -213,16 +218,16 @@ class Maze extends GameBase {
 
 		switch(direction) {
       case 'up':
-        this.y --;
-      break;
-      case 'down':
         this.y ++;
       break;
+      case 'down':
+        this.y --;
+      break;
       case 'left':
-        this.x --;
+        this.x ++;
       break;
       case 'right':
-        this.x ++;
+        this.x --;
       break;
 		};
 
@@ -233,8 +238,8 @@ class Maze extends GameBase {
 	};
 	canMove(direction) {
 
-    let x = this.x;
-    let y = this.y;
+    let x = this.manX;
+    let y = this.manY;
 
     switch(direction) {
       case 'up':
@@ -268,8 +273,10 @@ class Maze extends GameBase {
 	reset() {
 
 		this.score = 0;
-		this.x = 2;
-		this.y = 1;
+		this.x = 10;
+		this.y = 10;
+		this.manX = 12;
+		this.manY = 11;
 		this.coins = [];
 		this.colors = [
 			'#F8C800', // yellow
@@ -295,7 +302,7 @@ class Maze extends GameBase {
 	};
 	checkForWall(q) {
 
-		return this.walls.map((wall) => (`x${wall.x}y${wall.y}`)).includes(q);
+		return this.walls.map((wall) => (`x${wall.x+this.x}y${wall.y+this.y}`)).includes(q);
 
 	};
 	checkForFood(q) {
@@ -357,8 +364,6 @@ class Maze extends GameBase {
 		return this;
 
 	};
-	x = 2;
-	y = 1;
 };
 
 const
