@@ -41,7 +41,7 @@
 		--background: #1C1C1C;
 		--foreground: white;
 	}
-	
+
 }
 
 * {
@@ -140,5 +140,46 @@ canvas {
 		opacity: 0;
 		pointer-events: none;
 	}
-	
+
+}
+
+input[type="number"] {
+  width: 80px;
+  padding: 5px;
+  font-size: inherit;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  border: solid 1px red;
+  background-color: rgba(255, 0, 0, 0.5);
+  .grid-pixel {
+    background-color: rgba(255, 255, 255, 0.5);
+    &[data-guide="true"] {
+      background-color: rgba(255, 0, 0, 0.25);
+    }
+    &[data-active="yes"] {
+      background-color: black;
+    }
+  }
+}
+
+.inputs {
+  padding-top: 30px;
+  display: flex;
+  gap: 5px;
+}
+
+button.copy {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  border: 0;
+  background-color: red;
+  font-size: inherit;
+  color: white;
+  font-weight: bold;
 }
