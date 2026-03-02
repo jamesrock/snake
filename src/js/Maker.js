@@ -38,7 +38,7 @@ class Grid extends DisplayObject {
       pixel.dataset.index = index;
       pixel.dataset.x = x;
       pixel.dataset.y = y;
-      pixel.dataset.active === 'no';
+      pixel.dataset.state === 'empty';
       pixel.classList.add(this.guides.includes(x) || this.guides.includes(y) ? 'guide' : 'pixel');
       node.append(pixel);
       this.pixels.push(pixel);
@@ -59,7 +59,7 @@ class Grid extends DisplayObject {
   fill() {
 
     this.data.forEach((value, index) => {
-      this.pixels[index].dataset.active = this.bobMap[value];
+      this.pixels[index].dataset.state = this.stateAttributeMap[value];
     });
 
     return this;
@@ -67,17 +67,18 @@ class Grid extends DisplayObject {
   };
   set(index, value) {
 
-    this.data[index] = this.activeMap[value];
+    this.data[index] = this.stateDataMap[value];
+    this.pixels[index].dataset.state = this.stateAttributeMap[this.data[index]];
     return this;
 
   };
-  activeMap = {
+  stateDataMap = {
     'wall-yes': 1,
     'wall-no': 0,
     'coin-yes': 2,
-    'coin-no': 0,
+    'coin-no': 0
   };
-  bobMap = ['no', 'yes', 'coin'];
+  stateAttributeMap = ['empty', 'wall', 'coin'];
   guides = makeArray(25).map((value) => value * 3);
   pixels = [];
 };
