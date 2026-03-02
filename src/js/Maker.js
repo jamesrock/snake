@@ -2,7 +2,8 @@ import {
 	makeArray,
 	makeInput,
 	makeNode,
-	makeButton
+	makeButton,
+	makeSelect
 } from '@jamesrock/rockjs';
 
 export class Maker {
@@ -13,7 +14,7 @@ export class Maker {
     const settings = {
       'easy': {
         xPos: 3,
-        yPos: 71,
+        yPos: 38,
         size: 1475,
         pixelSize: 20,
         width: 37,
@@ -21,7 +22,7 @@ export class Maker {
       },
       'medium': {
         xPos: 3,
-        yPos: 70,
+        yPos: 37,
         size: 1405,
         pixelSize: 15,
         width: 46,
@@ -29,7 +30,7 @@ export class Maker {
       },
       'hard': {
         xPos: 4,
-        yPos: 68,
+        yPos: 36,
         size: 1370,
         pixelSize: 12,
         width: 55,
@@ -37,20 +38,22 @@ export class Maker {
       },
     };
 
-    const mode = 'easy';
-    const props = settings[mode];
     const maker = makeNode('div', 'maker');
     const inputs = makeNode('div', 'inputs');
     const target = makeNode('div', 'grid-target');
+    const difficulty = makeSelect(['easy', 'medium', 'hard'].map((a) => [a, a]));
+    const mode = makeSelect([['add', 'yes'], ['remove', 'no']]);
+    const set = makeInput(3);
+    const copyButton = makeButton('copy', 'copy');
+    const gap = 1;
+    const guides = makeArray(25).map((value) => value * 3);
+    let props = settings[difficulty.value];
     const xPos = makeInput(props.xPos);
     const yPos = makeInput(props.yPos);
     const size = makeInput(props.size);
     const pixelSize = makeInput(props.pixelSize);
     const width = makeInput(props.width);
     const height = makeInput(props.height);
-    const copyButton = makeButton('copy', 'copy');
-    const gap = 1;
-    const guides = makeArray(25).map((value) => value * 3);
 
     const makeGrid = (s, w, h) => {
       let x = 0;
@@ -82,6 +85,7 @@ export class Maker {
     };
 
     const changeHandler = () => {
+      body.style.backgroundImage = `url(/mazes/maze-${set.value}-${difficulty.value}.png)`;
       body.style.backgroundSize = `${size.value}px`;
       body.style.backgroundPosition = `calc(50% - ${xPos.value}px) calc(50% - ${yPos.value}px)`;
       if(grid) {
@@ -91,14 +95,29 @@ export class Maker {
       target.append(grid);
     };
 
-    body.style.backgroundImage = `url(/mazes/maze-${mode}.png)`;
+    difficulty.addEventListener('input', () => {
+      props = settings[difficulty.value];
+      xPos.value = props.xPos;
+      yPos.value = props.yPos;
+      size.value = props.size;
+      pixelSize.value = props.pixelSize;
+      width.value = props.width;
+      height.value = props.height;
+      changeHandler();
+    });
+
+    set.addEventListener('input', changeHandler);
 
     let grid = null;
 
-    [xPos, yPos, size, pixelSize, width, height].forEach((input) => {
-      input.addEventListener('input', changeHandler);
+    [set, difficulty, mode, copyButton].forEach((input) => {
       inputs.append(input);
     });
+
+    // [xPos, yPos, size, pixelSize, width, height].forEach((input) => {
+    //   input.addEventListener('input', changeHandler);
+    //   inputs.append(input);
+    // });
 
     maker.append(target);
     maker.append(inputs);
@@ -119,17 +138,16 @@ export class Maker {
 
     target.addEventListener('touchmove', (e) => {
      	const knob = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
-     	if(knob?.classList.contains('grid-pixel')) {
+     	if(knob?.classList.contains('guide')) {
     		if(knobs.indexOf(knob)===-1) {
      			knobs.push(knob);
-          knob.dataset.active = knob.dataset.active === 'yes' ? 'no' : 'yes';
+          // knob.dataset.active = knob.dataset.active === 'yes' ? 'no' : 'yes';
+          knob.dataset.active = mode.value;
           data[knob.dataset.index] = activeMap[knob.dataset.active];
     		};
      	};
      	e.preventDefault();
     });
-
-    body.append(copyButton);
 
     copyButton.addEventListener('click', () => {
       navigator.clipboard.writeText(JSON.stringify(data));

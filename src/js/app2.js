@@ -383,7 +383,7 @@ let touch = null;
 let xMovement = 0;
 let yMovement = 0;
 
-snake.renderTo(body);
+// snake.renderTo(body);
 
 document.addEventListener('keydown', (e) => {
 
@@ -461,4 +461,4 @@ document.addEventListener('drag-left', () => {
 
 });
 
-// window.maker = new Maker();
+window.maker = new Maker();
