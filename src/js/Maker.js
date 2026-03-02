@@ -54,6 +54,7 @@ export class Maker {
     const pixelSize = makeInput(props.pixelSize);
     const width = makeInput(props.width);
     const height = makeInput(props.height);
+    let data = this.data = [];
 
     const makeGrid = (s, w, h) => {
       let x = 0;
@@ -85,6 +86,7 @@ export class Maker {
     };
 
     const changeHandler = () => {
+      data = this.data = makeArray(props.width*props.height, () => 0);
       body.style.backgroundImage = `url(/mazes/maze-${set.value}-${difficulty.value}.png)`;
       body.style.backgroundSize = `${size.value}px`;
       body.style.backgroundPosition = `calc(50% - ${xPos.value}px) calc(50% - ${yPos.value}px)`;
@@ -126,7 +128,7 @@ export class Maker {
     changeHandler();
 
     let knobs = null;
-    let data = this.data = makeArray(props.width*props.height, () => 0);
+
     const activeMap = {
       'yes': 1,
       'no': 0
