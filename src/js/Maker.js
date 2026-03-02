@@ -69,7 +69,7 @@ export class Maker {
         pixel.dataset.x = x;
         pixel.dataset.y = y;
         pixel.dataset.active === 'no';
-        pixel.dataset.guide = guides.includes(x) || guides.includes(y);
+        pixel.classList.add(guides.includes(x) || guides.includes(y) ? 'guide' : 'pixel');
         out.append(pixel);
 
         if(x > 0 && x%(w-1)===0) {
