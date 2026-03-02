@@ -176,6 +176,9 @@ input[type="number"] {
   align-items: center;
   gap: 5px;
   position: absolute;
+  select {
+    padding: 0 10px;
+  }
 }
 
 button.copy {

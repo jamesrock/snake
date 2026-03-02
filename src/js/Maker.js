@@ -43,7 +43,7 @@ export class Maker {
     const target = makeNode('div', 'grid-target');
     const difficulty = makeSelect(['easy', 'medium', 'hard'].map((a) => [a, a]));
     const mode = makeSelect([['add', 'yes'], ['remove', 'no']]);
-    const set = makeInput(3);
+    const set = makeSelect([3, 4, 5].map((a) => [a, a]));
     const copyButton = makeButton('copy', 'copy');
     const gap = 1;
     const guides = makeArray(25).map((value) => value * 3);
